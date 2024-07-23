@@ -10,11 +10,12 @@ class Cards
         virtual ~Cards();
         string get_card_by_index(int position);
         void shuffle_cards();
-
+        string* get_cards();
+        static string cards_deck[20];
     protected:
 
     private:
-        static string cards_deck[8];
+
 };
 
 #endif // CARDS_H

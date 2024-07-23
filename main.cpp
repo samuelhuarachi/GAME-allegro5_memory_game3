@@ -101,10 +101,18 @@ int main()
     bool abc = false;
     bool exit_game = false;
 
-    string cards1_br[4] = {"Carro", "Bola", "Gato"};
-
+    /* Your Code Here */
+    string cards1_br[4] = {"Carro", "Bola", "Gato", "Teste"};
     Cards cards_nivel1;
 
+    int CARD_DIMENSION_WIDTH = 150;
+    int CARD_DIMENSION_HEIGHT = 150;
+    ALLEGRO_BITMAP* img_carro;
+    img_carro = al_load_bitmap("./images/carro.jpg");
+    ALLEGRO_BITMAP* img_car;
+    img_car = al_load_bitmap("./images/car.jpg");
+    ALLEGRO_BITMAP* img_dog;
+    img_dog= al_load_bitmap("./images/dog.jpg");
 
     memset(key, 0, sizeof(key));
     while(!exit_game) {
@@ -147,9 +155,24 @@ int main()
             al_clear_to_color(al_map_rgb(0, 0, 0));
 
             int column_x = 0;
-            for (int i = 0; i < 8; i++) {
-                string value1 = cards_nivel1.get_card_by_index(i);
-                al_draw_textf(font, al_map_rgb(255, 255, 255), 10, 20 + column_x, 0, "%s", value1.c_str());
+            int card_position_x = 4;
+            int card_position_y = 4;
+            int card_position_deslocation = 154;
+
+            for (int i = 0; i < 20; i++) {
+                string card_name = cards_nivel1.get_card_by_index(i);
+                al_draw_textf(font, al_map_rgb(255, 255, 255), 10, 20 + column_x, 0, "%s", card_name.c_str());
+
+                if (card_name == "Carro") {
+                    al_draw_bitmap_region(img_carro, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
+                    card_position_x = card_position_x + card_position_deslocation;
+                } else if (card_name == "Car") {
+                    al_draw_bitmap_region(img_car, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
+                    card_position_x = card_position_x + card_position_deslocation;
+                } else if (card_name == "Dog") {
+                    al_draw_bitmap_region(img_dog, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
+                    card_position_x = card_position_x + card_position_deslocation;
+                }
 
                 column_x = column_x + 10;
             }
@@ -179,7 +202,7 @@ Livro - Book
 Carro - Car
 Avião - Airplane
 Escola - School
-Sol - Sun
+Sol - Sun <---
 Lua - Moon
 Pássaro - Bird
 Floresta - Forest
