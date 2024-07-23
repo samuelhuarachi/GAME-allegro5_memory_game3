@@ -24,7 +24,8 @@ string* get_cards() {
 }
 
 void Cards::shuffle_cards() {
-    random_shuffle(std::begin(cards_deck), std::end(cards_deck));
+    std::srand ( unsigned ( std::time(0) ) );
+    random_shuffle(std::begin(cards_deck), std::end(cards_deck), int_random);
 }
 
 Cards::~Cards()
@@ -32,4 +33,4 @@ Cards::~Cards()
     //dtor
 }
 
-string Cards::cards_deck[] = {"Dog", "Cachorro", "Cat", "Gato", "House", "Casa", "Arvoce", "Tree", "Bola", "Ball", "Livro", "Book", "Carro", "Car", "Aviao", "Airplane", "Escola", "School", "Sol", "Sun"};
+string Cards::cards_deck[] = {"Dog", "Cachorro", "Cat", "Gato", "House", "Casa", "Arvore", "Tree", "Bola", "Ball", "Livro", "Book", "Carro", "Car", "Aviao", "Airplane", "Escola", "School", "Sol", "Sun"};
