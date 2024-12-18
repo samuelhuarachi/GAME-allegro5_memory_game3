@@ -72,8 +72,8 @@ int main()
     ALLEGRO_FONT* font;
 
 
-    //al_set_new_display_flags(ALLEGRO_FULLSCREEN);
-    display = al_create_display(800,800);
+    // al_set_new_display_flags(ALLEGRO_FULLSCREEN);
+    display = al_create_display(800,600);
     if(!display)
         al_show_native_message_box(NULL,NULL,NULL,"Couldnt create Screen",NULL,NULL);
 
@@ -147,6 +147,12 @@ int main()
     img_sol = al_load_bitmap("./images/sol.jpg");
     ALLEGRO_BITMAP* img_sun;
     img_sun= al_load_bitmap("./images/sun.jpg");
+    ALLEGRO_BITMAP* title;
+    title= al_load_bitmap("./images/title.png");
+    ALLEGRO_BITMAP* selection;
+    selection= al_load_bitmap("./images/selection.png");
+    ALLEGRO_BITMAP* background;
+    background= al_load_bitmap("./images/background.jpg");
 
     memset(key, 0, sizeof(key));
     while(!exit_game) {
@@ -188,18 +194,27 @@ int main()
         if (al_is_event_queue_empty(queue)) {
             al_clear_to_color(al_map_rgb(0, 0, 0));
 
+            al_draw_bitmap_region(title, 0, 0, 400, 80, 200, 0, 0);
+            al_draw_textf(font, al_map_rgb(255, 255, 255), 10, 10, 0, "%s", "Score: 0");
+            al_draw_textf(font, al_map_rgb(255, 255, 255), 685, 585, 0, "%s", "version 1.0.0");
+
+
+
             int column_x = 0;
-            int card_position_x = 4;
-            int card_position_y = 17;
-            int card_position_deslocation = 154;
-            int margin_right = 4;
-            int jump_line = 154;
-            int card_position_x_initial = card_position_x + margin_right;
-            card_position_x = card_position_x + margin_right;
+            int card_position_x = 2;
+            int card_position_y = 90;
+            int card_position_deslocation = 103;
+            int margin_left = 142;
+            int jump_line = 103;
+            int card_position_x_initial = card_position_x + margin_left;
+            card_position_x = card_position_x + margin_left;
             int period = 1;
             for (int i = 0; i < 20; i++) {
                 string card_name = cards_nivel1.get_card_by_index(i);
-                //al_draw_textf(font, al_map_rgb(255, 255, 255), 10, 20 + column_x, 0, "%s", card_name.c_str());
+                // al_draw_textf(font, al_map_rgb(255, 255, 255), 10, 20 + column_x, 0, "%s", card_name.c_str());
+
+
+
 
                 if (card_name == "Carro") {
                     al_draw_bitmap_region(img_carro, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
@@ -263,7 +278,7 @@ int main()
                     card_position_x = card_position_x + card_position_deslocation;
                 }
 
-                if (period == 4) {
+                if (period == 5) {
                     card_position_y = card_position_y + jump_line;
                     card_position_x = card_position_x_initial;
                     period = 0;
@@ -271,9 +286,13 @@ int main()
 
 
 
+
                 column_x = column_x + 10;
                 period = period + 1;
-            }
+            } // for
+
+            al_draw_bitmap_region(background, 0, 0, 100, 100, 144, 90, 0);
+            al_draw_bitmap_region(selection, 0, 0, 100, 100, 144, 90, 0);
 
             //al_draw_textf(font, al_map_rgb(255, 255, 255), 100, 200, 0, "X: %f", 1.1);
             //al_draw_textf(font, al_map_rgb(255,255,255), 20,30,0, "abc %d", 111);
