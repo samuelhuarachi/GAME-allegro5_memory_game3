@@ -28,8 +28,74 @@ using std::ifstream;
 using std::vector;
 #define KEY_SEEN     1
 #define KEY_RELEASED 2
-
 #include "Cards.h"
+
+
+ALLEGRO_BITMAP* img_carro;
+ALLEGRO_BITMAP* img_car;
+ALLEGRO_BITMAP* img_dog;
+ALLEGRO_BITMAP* img_cachorro;
+ALLEGRO_BITMAP* img_gato;
+ALLEGRO_BITMAP* img_cat;
+ALLEGRO_BITMAP* img_casa;
+ALLEGRO_BITMAP* img_house;
+ALLEGRO_BITMAP* img_arvore;
+ALLEGRO_BITMAP* img_tree;
+ALLEGRO_BITMAP* img_bola;
+ALLEGRO_BITMAP* img_ball;
+ALLEGRO_BITMAP* img_livro;
+ALLEGRO_BITMAP* img_book;
+ALLEGRO_BITMAP* img_aviao;
+ALLEGRO_BITMAP* img_airplane;
+ALLEGRO_BITMAP* img_escola;
+ALLEGRO_BITMAP* img_school;
+ALLEGRO_BITMAP* img_sol;
+ALLEGRO_BITMAP* img_sun;
+
+ALLEGRO_BITMAP* get_img_by_card_name(string card_name) {
+    if (card_name == "carro") {
+        return img_carro;
+    } else if (card_name == "car") {
+        return img_car;
+    } else if (card_name == "dog") {
+        return img_dog;
+    } else if (card_name == "cachorro") {
+        return img_cachorro;
+    } else if (card_name == "gato") {
+        return img_gato;
+    } else if (card_name == "cat") {
+        return img_cat;
+    } else if (card_name == "casa") {
+        return img_casa;
+    } else if (card_name == "house") {
+        return img_house;
+    } else if (card_name == "arvore") {
+        return img_arvore;
+    } else if (card_name == "tree") {
+        return img_tree;
+    } else if (card_name == "bola") {
+        return img_bola;
+    } else if (card_name == "ball") {
+        return img_ball;
+    } else if (card_name == "livro") {
+        return img_livro;
+    } else if (card_name == "book") {
+        return img_book;
+    } else if (card_name == "aviao") {
+        return img_aviao;
+    } else if (card_name == "airplane") {
+        return img_airplane;
+    } else if (card_name == "school") {
+        return img_school;
+    } else if (card_name == "escola") {
+        return img_escola;
+    } else if (card_name == "sol") {
+        return img_sol;
+    } else if (card_name == "sun") {
+        return img_sun;
+    }
+}
+
 
 bool is_pressing_the_key(int key) {
     if (key) {
@@ -47,16 +113,83 @@ template<typename T>
     b = temp;
 }
 
+
+
+enum TURN {
+    OPEN_FIRST,
+    OPEN_SECOND,
+    FINISH
+};
+
+typedef struct CONTROLLER_A
+{
+    int line, column, score = 0;
+    TURN turn = TURN::OPEN_FIRST;
+
+    int selection_one_column, selection_one_line, selection_two_column, selection_two_line, card_number_one = -1;
+
+} CONTROLLER_A;
+
+CONTROLLER_A controller_a;
+
+
+void controller_a_set_line_column_by_key_direction_pressed(unsigned char *key, CONTROLLER_A* controller_a) {
+    if(key[ALLEGRO_KEY_UP]) {
+        controller_a->line = controller_a->line - 1;
+    }
+
+    if(key[ALLEGRO_KEY_DOWN]) {
+        controller_a->line = controller_a->line + 1;
+    }
+
+    if(key[ALLEGRO_KEY_LEFT]) {
+        controller_a->column = controller_a->column - 1;
+    }
+
+    if(key[ALLEGRO_KEY_RIGHT]) {
+        controller_a->column = controller_a->column + 1;
+    }
+
+    if (controller_a->line < 0) {
+        controller_a->line = 0;
+    }
+
+    if (controller_a->line > 3) {
+        controller_a->line = 3;
+    }
+
+    if (controller_a->column < 0) {
+        controller_a->column = 0;
+    }
+
+    if (controller_a->column > 4) {
+        controller_a->column = 4;
+    }
+}
+
+void controller_a_selection_by_space_pressed(CONTROLLER_A* controller_a) {
+
+    if (controller_a->turn == TURN::OPEN_FIRST) {
+        controller_a->selection_one_column = controller_a->column;
+        controller_a->selection_one_line = controller_a->line;
+
+        controller_a->card_number_one = controller_a->selection_one_line * 5 + controller_a->column;
+        controller_a->turn = TURN::OPEN_SECOND;
+    }
+}
+
 int main()
 {
+
+
     ALLEGRO_DISPLAY* display;
 
     if(!al_init())
-        al_show_native_message_box(NULL,NULL,NULL,"Allegro couldnt initialize",NULL,NULL);
+        al_show_native_message_box(NULL,NULL,NULL,"Couldnt initialize",NULL,NULL);
 
     if(!al_install_keyboard())
     {
-        printf("couldn't initialize keyboard\n");
+        printf("Couldn't initialize keyboard\n");
     }
     /*if(!al_install_mouse())
     {
@@ -72,7 +205,7 @@ int main()
     ALLEGRO_FONT* font;
 
 
-    // al_set_new_display_flags(ALLEGRO_FULLSCREEN);
+    //al_set_new_display_flags(ALLEGRO_FULLSCREEN);
     display = al_create_display(800,600);
     if(!display)
         al_show_native_message_box(NULL,NULL,NULL,"Couldnt create Screen",NULL,NULL);
@@ -105,54 +238,34 @@ int main()
     string cards1_br[4] = {"Carro", "Bola", "Gato", "Teste"};
     Cards cards_nivel1;
 
-    int CARD_DIMENSION_WIDTH = 150;
-    int CARD_DIMENSION_HEIGHT = 150;
-    ALLEGRO_BITMAP* img_carro;
+    int CARD_DIMENSION_WIDTH = 100;
+    int CARD_DIMENSION_HEIGHT = 100;
+    ALLEGRO_BITMAP* title; title= al_load_bitmap("./images/title.png");
+    ALLEGRO_BITMAP* selection; selection= al_load_bitmap("./images/selection.png");
+    ALLEGRO_BITMAP* background; background= al_load_bitmap("./images/background.jpg");
+
     img_carro = al_load_bitmap("./images/carro.jpg");
-    ALLEGRO_BITMAP* img_car;
     img_car = al_load_bitmap("./images/car.jpg");
-    ALLEGRO_BITMAP* img_dog;
     img_dog = al_load_bitmap("./images/dog.jpg");
-    ALLEGRO_BITMAP* img_cachorro;
     img_cachorro = al_load_bitmap("./images/cachorro.jpg");
-    ALLEGRO_BITMAP* img_gato;
     img_gato = al_load_bitmap("./images/gato.jpg");
-    ALLEGRO_BITMAP* img_cat;
     img_cat = al_load_bitmap("./images/cat.jpg");
-    ALLEGRO_BITMAP* img_casa;
     img_casa = al_load_bitmap("./images/casa.jpg");
-    ALLEGRO_BITMAP* img_house;
     img_house = al_load_bitmap("./images/house.jpg");
-    ALLEGRO_BITMAP* img_arvore;
     img_arvore = al_load_bitmap("./images/arvore.jpg");
-    ALLEGRO_BITMAP* img_tree;
     img_tree = al_load_bitmap("./images/tree.jpg");
-    ALLEGRO_BITMAP* img_bola;
     img_bola = al_load_bitmap("./images/bola.jpg");
-    ALLEGRO_BITMAP* img_ball;
     img_ball = al_load_bitmap("./images/ball.jpg");
-    ALLEGRO_BITMAP* img_livro;
     img_livro = al_load_bitmap("./images/livro.jpg");
-    ALLEGRO_BITMAP* img_book;
     img_book = al_load_bitmap("./images/book.jpg");
-    ALLEGRO_BITMAP* img_aviao;
     img_aviao = al_load_bitmap("./images/aviao.jpg");
-    ALLEGRO_BITMAP* img_airplane;
     img_airplane = al_load_bitmap("./images/airplane.jpg");
-    ALLEGRO_BITMAP* img_escola;
     img_escola = al_load_bitmap("./images/escola.jpg");
-    ALLEGRO_BITMAP* img_school;
     img_school= al_load_bitmap("./images/school.jpg");
-    ALLEGRO_BITMAP* img_sol;
     img_sol = al_load_bitmap("./images/sol.jpg");
-    ALLEGRO_BITMAP* img_sun;
     img_sun= al_load_bitmap("./images/sun.jpg");
-    ALLEGRO_BITMAP* title;
-    title= al_load_bitmap("./images/title.png");
-    ALLEGRO_BITMAP* selection;
-    selection= al_load_bitmap("./images/selection.png");
-    ALLEGRO_BITMAP* background;
-    background= al_load_bitmap("./images/background.jpg");
+
+
 
     memset(key, 0, sizeof(key));
     while(!exit_game) {
@@ -171,6 +284,16 @@ int main()
                 break;
             case ALLEGRO_EVENT_KEY_DOWN: // Key down
                 key[event.keyboard.keycode] = KEY_SEEN | KEY_RELEASED;
+
+                if(key[ALLEGRO_KEY_SPACE]) {
+                    controller_a_selection_by_space_pressed(&controller_a);
+                }
+
+                if(key[ALLEGRO_KEY_UP] || key[ALLEGRO_KEY_DOWN] || key[ALLEGRO_KEY_LEFT] || key[ALLEGRO_KEY_RIGHT]) {
+                    controller_a_set_line_column_by_key_direction_pressed(key, &controller_a);
+                }
+
+
                 break;
             case ALLEGRO_EVENT_KEY_UP: // Key up
                 if(key[ALLEGRO_KEY_A]) {
@@ -198,8 +321,6 @@ int main()
             al_draw_textf(font, al_map_rgb(255, 255, 255), 10, 10, 0, "%s", "Score: 0");
             al_draw_textf(font, al_map_rgb(255, 255, 255), 685, 585, 0, "%s", "version 1.0.0");
 
-
-
             int column_x = 0;
             int card_position_x = 2;
             int card_position_y = 90;
@@ -207,76 +328,23 @@ int main()
             int margin_left = 142;
             int jump_line = 103;
             int card_position_x_initial = card_position_x + margin_left;
+            int card_position_y_initial = card_position_y;
             card_position_x = card_position_x + margin_left;
             int period = 1;
             for (int i = 0; i < 20; i++) {
                 string card_name = cards_nivel1.get_card_by_index(i);
                 // al_draw_textf(font, al_map_rgb(255, 255, 255), 10, 20 + column_x, 0, "%s", card_name.c_str());
 
-
-
-
-                if (card_name == "Carro") {
-                    al_draw_bitmap_region(img_carro, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                    card_position_x = card_position_x + card_position_deslocation;
-                } else if (card_name == "Car") {
-                    al_draw_bitmap_region(img_car, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                    card_position_x = card_position_x + card_position_deslocation;
-                } else if (card_name == "Dog") {
-                    al_draw_bitmap_region(img_dog, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                    card_position_x = card_position_x + card_position_deslocation;
-                } else if (card_name == "Cachorro") {
-                    al_draw_bitmap_region(img_cachorro, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                    card_position_x = card_position_x + card_position_deslocation;
-                } else if (card_name == "Gato") {
-                    al_draw_bitmap_region(img_gato, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                    card_position_x = card_position_x + card_position_deslocation;
-                } else if (card_name == "Cat") {
-                    al_draw_bitmap_region(img_cat, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                    card_position_x = card_position_x + card_position_deslocation;
-                } else if (card_name == "Casa") {
-                    al_draw_bitmap_region(img_casa, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                    card_position_x = card_position_x + card_position_deslocation;
-                } else if (card_name == "House") {
-                    al_draw_bitmap_region(img_house, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                    card_position_x = card_position_x + card_position_deslocation;
-                } else if (card_name == "Arvore") {
-                    al_draw_bitmap_region(img_arvore, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                    card_position_x = card_position_x + card_position_deslocation;
-                } else if (card_name == "Tree") {
-                    al_draw_bitmap_region(img_tree, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                    card_position_x = card_position_x + card_position_deslocation;
-                } else if (card_name == "Bola") {
-                    al_draw_bitmap_region(img_bola, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                    card_position_x = card_position_x + card_position_deslocation;
-                } else if (card_name == "Ball") {
-                    al_draw_bitmap_region(img_ball, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                    card_position_x = card_position_x + card_position_deslocation;
-                } else if (card_name == "Livro") {
-                    al_draw_bitmap_region(img_livro, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                    card_position_x = card_position_x + card_position_deslocation;
-                } else if (card_name == "Book") {
-                    al_draw_bitmap_region(img_book, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                    card_position_x = card_position_x + card_position_deslocation;
-                } else if (card_name == "Aviao") {
-                    al_draw_bitmap_region(img_aviao, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                    card_position_x = card_position_x + card_position_deslocation;
-                } else if (card_name == "Airplane") {
-                    al_draw_bitmap_region(img_airplane, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                    card_position_x = card_position_x + card_position_deslocation;
-                } else if (card_name == "School") {
-                    al_draw_bitmap_region(img_school, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                    card_position_x = card_position_x + card_position_deslocation;
-                } else if (card_name == "Escola") {
-                    al_draw_bitmap_region(img_escola, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                    card_position_x = card_position_x + card_position_deslocation;
-                } else if (card_name == "Sol") {
-                    al_draw_bitmap_region(img_sol, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                    card_position_x = card_position_x + card_position_deslocation;
-                } else if (card_name == "Sun") {
-                    al_draw_bitmap_region(img_sun, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                    card_position_x = card_position_x + card_position_deslocation;
+                if (controller_a.card_number_one == i) {
+                    ALLEGRO_BITMAP* some_card = get_img_by_card_name(card_name);
+                    al_draw_bitmap_region(some_card, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
+                } else {
+                    al_draw_bitmap_region(background, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
                 }
+
+                card_position_x = card_position_x + card_position_deslocation;
+
+
 
                 if (period == 5) {
                     card_position_y = card_position_y + jump_line;
@@ -284,15 +352,14 @@ int main()
                     period = 0;
                 }
 
-
-
-
                 column_x = column_x + 10;
                 period = period + 1;
             } // for
 
-            al_draw_bitmap_region(background, 0, 0, 100, 100, 144, 90, 0);
-            al_draw_bitmap_region(selection, 0, 0, 100, 100, 144, 90, 0);
+
+
+
+            al_draw_bitmap_region(selection, 0, 0, 100, 100, card_position_x_initial + (controller_a.column * card_position_deslocation) , card_position_y_initial + (controller_a.line * card_position_deslocation), 0);
 
             //al_draw_textf(font, al_map_rgb(255, 255, 255), 100, 200, 0, "X: %f", 1.1);
             //al_draw_textf(font, al_map_rgb(255,255,255), 20,30,0, "abc %d", 111);
@@ -304,6 +371,8 @@ int main()
 
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
+
+
 
     return 0;
 }
