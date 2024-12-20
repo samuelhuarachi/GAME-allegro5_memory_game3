@@ -32,4 +32,5 @@ Cards::~Cards()
 {
     //dtor
 }
-string Cards::cards_deck[] = {"dog", "cachorro", "cat", "gato", "house", "casa", "arvore", "tree", "bola", "ball", "livro", "book", "carro", "car", "aviao", "airplane", "escola", "school", "sol", "sun"};
+string Cards::cards_deck[] = {"dog", "cachorro", "cat", "gato", "house", "casa", "arvore", "tree", "bola",
+"ball", "livro", "book", "carro", "car", "aviao", "airplane", "escola", "school", "sol", "sun"};

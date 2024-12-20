@@ -118,7 +118,8 @@ template<typename T>
 enum TURN {
     OPEN_FIRST,
     OPEN_SECOND,
-    FINISH
+    FINISH,
+    ENDGAME
 };
 
 typedef struct CONTROLLER_A
@@ -126,7 +127,13 @@ typedef struct CONTROLLER_A
     int line, column, score = 0;
     TURN turn = TURN::OPEN_FIRST;
 
-    int selection_one_column, selection_one_line, selection_two_column, selection_two_line, card_number_one = -1;
+    int selection_one_column, selection_one_line, selection_two_column, selection_two_line = -1;
+    int card_number_one = -1;
+    int card_number_two = -1;
+
+    unsigned int block_events = 0;
+
+    std::vector<int> got_right;
 
 } CONTROLLER_A;
 
@@ -167,16 +174,83 @@ void controller_a_set_line_column_by_key_direction_pressed(unsigned char *key, C
     }
 }
 
+
+bool is_got_it_all_cards(CONTROLLER_A* controller_a) {
+    return controller_a->got_right.size() == 20;
+}
+
+bool is_card_got_it_right(CONTROLLER_A* controller_a, int index_to_find) {
+    if (std::find(controller_a->got_right.begin(), controller_a->got_right.end(), index_to_find) != controller_a->got_right.end()) {
+        return true;
+    }
+    return false;
+}
+
 void controller_a_selection_by_space_pressed(CONTROLLER_A* controller_a) {
+
+    // check if is a got card
+    int card_selected = controller_a->line * 5 + controller_a->column;
+    if (is_card_got_it_right(controller_a, card_selected)) {
+        return;
+    }
 
     if (controller_a->turn == TURN::OPEN_FIRST) {
         controller_a->selection_one_column = controller_a->column;
         controller_a->selection_one_line = controller_a->line;
 
-        controller_a->card_number_one = controller_a->selection_one_line * 5 + controller_a->column;
+        controller_a->card_number_one = card_selected;
         controller_a->turn = TURN::OPEN_SECOND;
     }
+
+    if (controller_a->turn == TURN::OPEN_SECOND) {
+        controller_a->selection_two_column = controller_a->column;
+        controller_a->selection_two_line = controller_a->line;
+
+        controller_a->card_number_two = card_selected;
+
+        // check if open the same card at the first turn
+        if (controller_a->card_number_two == controller_a->card_number_one) {
+            controller_a->selection_two_column = -1;
+            controller_a->selection_two_line = -1;
+            return;
+        }
+
+        controller_a->turn = TURN::FINISH;
+        controller_a->block_events = 150;
+    }
 }
+
+void check_card_got_it_right(CONTROLLER_A* controller_a, string card_name1, string card_name2) {
+    controller_a->turn = TURN::OPEN_FIRST;
+
+    // Check if the player got it right.
+    if (((card_name1 == "dog" && card_name2 == "cachorro") || (card_name2 == "dog" && card_name1 == "cachorro")) ||
+        ((card_name1 == "cat" && card_name2 == "gato") || (card_name1 == "gato" && card_name2 == "cat")) ||
+        ((card_name1 == "house" && card_name2 == "casa") || (card_name1 == "casa" && card_name2 == "house")) ||
+        ((card_name1 == "tree" && card_name2 == "arvore") || (card_name1 == "arvore" && card_name2 == "tree")) ||
+        ((card_name1 == "ball" && card_name2 == "bola") || (card_name1 == "bola" && card_name2 == "ball")) ||
+        ((card_name1 == "book" && card_name2 == "livro") || (card_name1 == "livro" && card_name2 == "book")) ||
+        ((card_name1 == "car" && card_name2 == "carro") || (card_name1 == "carro" && card_name2 == "car")) ||
+        ((card_name1 == "aviao" && card_name2 == "airplane") || (card_name1 == "airplane" && card_name2 == "aviao")) ||
+        ((card_name1 == "school" && card_name2 == "escola") || (card_name1 == "escola" && card_name2 == "school")) ||
+        ((card_name1 == "sun" && card_name2 == "sol") || (card_name1 == "sol" && card_name2 == "sun"))) {
+
+        controller_a->got_right.push_back(controller_a->card_number_one);
+        controller_a->got_right.push_back(controller_a->card_number_two);
+
+        return;
+    }
+
+    controller_a->selection_one_column = -1;
+    controller_a->selection_one_line = -1;
+    controller_a->selection_two_column = -1;
+    controller_a->selection_two_line = -1;
+    controller_a->card_number_one = -1;
+    controller_a->card_number_two = -1;
+}
+
+
+
 
 int main()
 {
@@ -205,7 +279,7 @@ int main()
     ALLEGRO_FONT* font;
 
 
-    //al_set_new_display_flags(ALLEGRO_FULLSCREEN);
+    // al_set_new_display_flags(ALLEGRO_FULLSCREEN);
     display = al_create_display(800,600);
     if(!display)
         al_show_native_message_box(NULL,NULL,NULL,"Couldnt create Screen",NULL,NULL);
@@ -234,8 +308,7 @@ int main()
     bool abc = false;
     bool exit_game = false;
 
-    /* Your Code Here */
-    string cards1_br[4] = {"Carro", "Bola", "Gato", "Teste"};
+    /* Your Code Below */
     Cards cards_nivel1;
 
     int CARD_DIMENSION_WIDTH = 100;
@@ -265,11 +338,10 @@ int main()
     img_sol = al_load_bitmap("./images/sol.jpg");
     img_sun= al_load_bitmap("./images/sun.jpg");
 
-
-
     memset(key, 0, sizeof(key));
     while(!exit_game) {
         al_wait_for_event(queue, &event);
+
         switch(event.type)
         {
             case ALLEGRO_EVENT_TIMER: // Holding key
@@ -285,11 +357,11 @@ int main()
             case ALLEGRO_EVENT_KEY_DOWN: // Key down
                 key[event.keyboard.keycode] = KEY_SEEN | KEY_RELEASED;
 
-                if(key[ALLEGRO_KEY_SPACE]) {
+                if(key[ALLEGRO_KEY_SPACE] && controller_a.block_events == 0) {
                     controller_a_selection_by_space_pressed(&controller_a);
                 }
 
-                if(key[ALLEGRO_KEY_UP] || key[ALLEGRO_KEY_DOWN] || key[ALLEGRO_KEY_LEFT] || key[ALLEGRO_KEY_RIGHT]) {
+                if((key[ALLEGRO_KEY_UP] || key[ALLEGRO_KEY_DOWN] || key[ALLEGRO_KEY_LEFT] || key[ALLEGRO_KEY_RIGHT]) && controller_a.block_events == 0) {
                     controller_a_set_line_column_by_key_direction_pressed(key, &controller_a);
                 }
 
@@ -312,7 +384,6 @@ int main()
                 break;*/
 
         }
-        //al_draw_textf(font, al_map_rgb(255, 255, 255), 10, 20, 0, "X: %f", 1.2);
 
         if (al_is_event_queue_empty(queue)) {
             al_clear_to_color(al_map_rgb(0, 0, 0));
@@ -333,41 +404,41 @@ int main()
             int period = 1;
             for (int i = 0; i < 20; i++) {
                 string card_name = cards_nivel1.get_card_by_index(i);
-                // al_draw_textf(font, al_map_rgb(255, 255, 255), 10, 20 + column_x, 0, "%s", card_name.c_str());
-
-                if (controller_a.card_number_one == i) {
+                if ((controller_a.card_number_one == i || controller_a.card_number_two == i) || is_card_got_it_right(&controller_a, i)) {
                     ALLEGRO_BITMAP* some_card = get_img_by_card_name(card_name);
                     al_draw_bitmap_region(some_card, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
                 } else {
                     al_draw_bitmap_region(background, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
                 }
-
                 card_position_x = card_position_x + card_position_deslocation;
-
-
-
                 if (period == 5) {
                     card_position_y = card_position_y + jump_line;
                     card_position_x = card_position_x_initial;
                     period = 0;
                 }
-
                 column_x = column_x + 10;
                 period = period + 1;
             } // for
 
-
-
-
             al_draw_bitmap_region(selection, 0, 0, 100, 100, card_position_x_initial + (controller_a.column * card_position_deslocation) , card_position_y_initial + (controller_a.line * card_position_deslocation), 0);
 
-            //al_draw_textf(font, al_map_rgb(255, 255, 255), 100, 200, 0, "X: %f", 1.1);
-            //al_draw_textf(font, al_map_rgb(255,255,255), 20,30,0, "abc %d", 111);
-            //al_draw_rectangle(200, 200, 600, 280, al_map_rgb(255, 255, 255), 1);
+            if (controller_a.turn == TURN::FINISH && controller_a.block_events == 0)
+                check_card_got_it_right(&controller_a, cards_nivel1.get_card_by_index(controller_a.card_number_one), cards_nivel1.get_card_by_index(controller_a.card_number_two));
 
         }
+
+        if (is_got_it_all_cards(&controller_a)) {
+            al_draw_textf(font, al_map_rgb(255, 255, 255), 10, 20, 0, "%s", "Completado!!!");
+        }
+
         al_flip_display();
-    }
+
+        if (controller_a.block_events > 0)
+            controller_a.block_events = controller_a.block_events - 1;
+
+
+
+    } // game loop
 
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
