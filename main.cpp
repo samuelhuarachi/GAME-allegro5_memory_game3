@@ -52,6 +52,7 @@ ALLEGRO_BITMAP* img_school;
 ALLEGRO_BITMAP* img_sol;
 ALLEGRO_BITMAP* img_sun;
 
+
 ALLEGRO_BITMAP* get_img_by_card_name(string card_name) {
     if (card_name == "carro") {
         return img_carro;
@@ -97,12 +98,14 @@ ALLEGRO_BITMAP* get_img_by_card_name(string card_name) {
 }
 
 
+
 bool is_pressing_the_key(int key) {
     if (key) {
         return true;
     }
     return false;
 }
+
 
 // Swap<char>(c,d);
 // Swap<int>(a,b);
@@ -112,8 +115,6 @@ template<typename T>
     a = b;
     b = temp;
 }
-
-
 
 enum TURN {
     OPEN_FIRST,
@@ -139,6 +140,16 @@ typedef struct CONTROLLER_A
 
 CONTROLLER_A controller_a;
 
+void controller_a_restart(CONTROLLER_A* controller_a) {
+    controller_a->got_right.clear();
+    controller_a->selection_one_column = -1;
+    controller_a->selection_one_line = -1;
+    controller_a->selection_two_column = -1;
+    controller_a->selection_two_line = -1;
+    controller_a->card_number_one = -1;
+    controller_a->card_number_two = -1;
+    controller_a->turn = TURN::OPEN_FIRST;
+}
 
 void controller_a_set_line_column_by_key_direction_pressed(unsigned char *key, CONTROLLER_A* controller_a) {
     if(key[ALLEGRO_KEY_UP]) {
@@ -174,8 +185,7 @@ void controller_a_set_line_column_by_key_direction_pressed(unsigned char *key, C
     }
 }
 
-
-bool is_got_it_all_cards(CONTROLLER_A* controller_a) {
+bool is_all_cards_are_opened(CONTROLLER_A* controller_a) {
     return controller_a->got_right.size() == 20;
 }
 
@@ -216,7 +226,7 @@ void controller_a_selection_by_space_pressed(CONTROLLER_A* controller_a) {
         }
 
         controller_a->turn = TURN::FINISH;
-        controller_a->block_events = 150;
+        controller_a->block_events = 100;
     }
 }
 
@@ -238,6 +248,10 @@ void check_card_got_it_right(CONTROLLER_A* controller_a, string card_name1, stri
         controller_a->got_right.push_back(controller_a->card_number_one);
         controller_a->got_right.push_back(controller_a->card_number_two);
 
+        if (is_all_cards_are_opened(controller_a)) {
+            controller_a->turn = TURN::ENDGAME;
+        }
+
         return;
     }
 
@@ -249,22 +263,18 @@ void check_card_got_it_right(CONTROLLER_A* controller_a, string card_name1, stri
     controller_a->card_number_two = -1;
 }
 
-
-
-
 int main()
 {
-
-
     ALLEGRO_DISPLAY* display;
+
 
     if(!al_init())
         al_show_native_message_box(NULL,NULL,NULL,"Couldnt initialize",NULL,NULL);
 
     if(!al_install_keyboard())
-    {
         printf("Couldn't initialize keyboard\n");
-    }
+
+
     /*if(!al_install_mouse())
     {
         printf("couldn't initialize mouse\n");
@@ -278,8 +288,7 @@ int main()
 
     ALLEGRO_FONT* font;
 
-
-    // al_set_new_display_flags(ALLEGRO_FULLSCREEN);
+    al_set_new_display_flags(ALLEGRO_FULLSCREEN);
     display = al_create_display(800,600);
     if(!display)
         al_show_native_message_box(NULL,NULL,NULL,"Couldnt create Screen",NULL,NULL);
@@ -365,6 +374,9 @@ int main()
                     controller_a_set_line_column_by_key_direction_pressed(key, &controller_a);
                 }
 
+                if(key[ALLEGRO_KEY_ENTER] && controller_a.turn == TURN::ENDGAME) {
+                    controller_a_restart(&controller_a);
+                }
 
                 break;
             case ALLEGRO_EVENT_KEY_UP: // Key up
@@ -424,12 +436,13 @@ int main()
 
             if (controller_a.turn == TURN::FINISH && controller_a.block_events == 0)
                 check_card_got_it_right(&controller_a, cards_nivel1.get_card_by_index(controller_a.card_number_one), cards_nivel1.get_card_by_index(controller_a.card_number_two));
-
         }
 
-        if (is_got_it_all_cards(&controller_a)) {
-            al_draw_textf(font, al_map_rgb(255, 255, 255), 10, 20, 0, "%s", "Completado!!!");
+        if (controller_a.turn == TURN::ENDGAME) {
+            al_draw_textf(font, al_map_rgb(255, 255, 255), 320, 535, 0, "%s", "Press ENTER to restart");
         }
+
+        al_draw_textf(font, al_map_rgb(255, 255, 255), 255, 520, 0, "%s", "Controls: SPACE and ARROWS, ESC to exit");
 
         al_flip_display();
 
