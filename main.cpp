@@ -230,6 +230,7 @@ void controller_a_selection_by_space_pressed(CONTROLLER_A* controller_a) {
     }
 }
 
+
 void check_card_got_it_right(CONTROLLER_A* controller_a, string card_name1, string card_name2) {
     controller_a->turn = TURN::OPEN_FIRST;
 
@@ -263,6 +264,8 @@ void check_card_got_it_right(CONTROLLER_A* controller_a, string card_name1, stri
     controller_a->card_number_two = -1;
 }
 
+
+
 int main()
 {
     ALLEGRO_DISPLAY* display;
@@ -274,16 +277,15 @@ int main()
     if(!al_install_keyboard())
         printf("Couldn't initialize keyboard\n");
 
-
     /*if(!al_install_mouse())
     {
         printf("couldn't initialize mouse\n");
     }*/
     al_init_primitives_addon();
-    al_install_audio();
     al_set_new_display_option(ALLEGRO_SAMPLE_BUFFERS, 1, ALLEGRO_SUGGEST);
     al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
     al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
+    al_install_audio();
     al_init_acodec_addon();
 
     ALLEGRO_FONT* font;
@@ -320,11 +322,26 @@ int main()
     /* Your Code Below */
     Cards cards_nivel1;
 
+
+    al_reserve_samples(2);
+    ALLEGRO_SAMPLE *background_sound;
+    ALLEGRO_SAMPLE_ID background_sound_id;
+    background_sound = al_load_sample("./backgroundsound.ogg");
+    //al_play_sample(background_sound, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, &background_sound_id);
+    //al_reserve_samples(1);
+
+    ALLEGRO_SAMPLE *sound_click;
+    ALLEGRO_SAMPLE_ID sound_click_id;
+    sound_click = al_load_sample("./click.ogg");
+
+
+
     int CARD_DIMENSION_WIDTH = 100;
     int CARD_DIMENSION_HEIGHT = 100;
     ALLEGRO_BITMAP* title; title= al_load_bitmap("./images/title.png");
     ALLEGRO_BITMAP* selection; selection= al_load_bitmap("./images/selection.png");
     ALLEGRO_BITMAP* background; background= al_load_bitmap("./images/background.jpg");
+
 
     img_carro = al_load_bitmap("./images/carro.jpg");
     img_car = al_load_bitmap("./images/car.jpg");
@@ -348,6 +365,9 @@ int main()
     img_sun= al_load_bitmap("./images/sun.jpg");
 
     memset(key, 0, sizeof(key));
+
+    al_play_sample(background_sound, 0.3, 0, 1, ALLEGRO_PLAYMODE_LOOP, &background_sound_id);
+
     while(!exit_game) {
         al_wait_for_event(queue, &event);
 
@@ -368,6 +388,7 @@ int main()
 
                 if(key[ALLEGRO_KEY_SPACE] && controller_a.block_events == 0) {
                     controller_a_selection_by_space_pressed(&controller_a);
+                    al_play_sample(sound_click, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, &sound_click_id);
                 }
 
                 if((key[ALLEGRO_KEY_UP] || key[ALLEGRO_KEY_DOWN] || key[ALLEGRO_KEY_LEFT] || key[ALLEGRO_KEY_RIGHT]) && controller_a.block_events == 0) {
@@ -455,6 +476,7 @@ int main()
 
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
+    al_destroy_sample(background_sound);
 
 
 
