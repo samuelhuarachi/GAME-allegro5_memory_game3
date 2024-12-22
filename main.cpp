@@ -288,7 +288,7 @@ int main()
 
     ALLEGRO_FONT* font;
 
-    al_set_new_display_flags(ALLEGRO_FULLSCREEN);
+    //al_set_new_display_flags(ALLEGRO_FULLSCREEN);
     display = al_create_display(800,600);
     if(!display)
         al_show_native_message_box(NULL,NULL,NULL,"Couldnt create Screen",NULL,NULL);

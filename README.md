@@ -1,4 +1,8 @@
 # Memory Game
+
+![alt text](https://i.ibb.co/V2V7nrg/Capture.png)
+
+
 Educational Benefits:
 - Memory Development: Helps improve short-term memory and cognitive skills.
 - Bilingual Learning: Enhances vocabulary and comprehension in both Portuguese and English.
