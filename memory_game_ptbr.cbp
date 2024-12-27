@@ -30,7 +30,10 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="../../../../../allegro-5.0.10-mingw-4.7.0/lib/liballegro-5.0.10-monolith-mt.a" />
+					<Add option="-static-libstdc++" />
+					<Add option="-static-libgcc" />
+					<Add option="-static" />
+					<Add library="../../../../allegro-5.0.10-mingw-4.7.0/bin/allegro-5.0.10-monolith-mt.dll" />
 				</Linker>
 			</Target>
 		</Build>
@@ -39,8 +42,10 @@
 			<Add option="-fexceptions" />
 			<Add directory="../../../../../allegro-5.0.10-mingw-4.7.0/include" />
 		</Compiler>
+		<Unit filename="include/Card.h" />
 		<Unit filename="include/Cards.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="src/Card.cpp" />
 		<Unit filename="src/Cards.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />

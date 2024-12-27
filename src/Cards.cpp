@@ -26,6 +26,7 @@ string Cards::get_card_by_index(int index) {
 void Cards::shuffle_cards() {
     std::srand ( unsigned ( std::time(0) ) );
     random_shuffle(std::begin(cards_deck), std::end(cards_deck), int_random);
+    random_shuffle(std::begin(cards), std::end(cards), int_random);
 }
 
 Cards::~Cards()

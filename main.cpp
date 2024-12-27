@@ -29,9 +29,10 @@ using std::vector;
 #define KEY_SEEN     1
 #define KEY_RELEASED 2
 #include "Cards.h"
+#include "Card.h"
 
 
-ALLEGRO_BITMAP* img_carro;
+ALLEGRO_BITMAP* some_img;
 ALLEGRO_BITMAP* img_car;
 ALLEGRO_BITMAP* img_dog;
 ALLEGRO_BITMAP* img_cachorro;
@@ -55,7 +56,7 @@ ALLEGRO_BITMAP* img_sun;
 
 ALLEGRO_BITMAP* get_img_by_card_name(string card_name) {
     if (card_name == "carro") {
-        return img_carro;
+        return some_img;
     } else if (card_name == "car") {
         return img_car;
     } else if (card_name == "dog") {
@@ -149,6 +150,7 @@ void controller_a_restart(CONTROLLER_A* controller_a) {
     controller_a->card_number_one = -1;
     controller_a->card_number_two = -1;
     controller_a->turn = TURN::OPEN_FIRST;
+    controller_a->score = 0;
 }
 
 void controller_a_set_line_column_by_key_direction_pressed(unsigned char *key, CONTROLLER_A* controller_a) {
@@ -248,6 +250,7 @@ void check_card_got_it_right(CONTROLLER_A* controller_a, string card_name1, stri
 
         controller_a->got_right.push_back(controller_a->card_number_one);
         controller_a->got_right.push_back(controller_a->card_number_two);
+        controller_a->score = controller_a->score + 10;
 
         if (is_all_cards_are_opened(controller_a)) {
             controller_a->turn = TURN::ENDGAME;
@@ -255,7 +258,7 @@ void check_card_got_it_right(CONTROLLER_A* controller_a, string card_name1, stri
 
         return;
     }
-
+    controller_a->score = controller_a->score - 10;
     controller_a->selection_one_column = -1;
     controller_a->selection_one_line = -1;
     controller_a->selection_two_column = -1;
@@ -269,7 +272,6 @@ void check_card_got_it_right(CONTROLLER_A* controller_a, string card_name1, stri
 int main()
 {
     ALLEGRO_DISPLAY* display;
-
 
     if(!al_init())
         al_show_native_message_box(NULL,NULL,NULL,"Couldnt initialize",NULL,NULL);
@@ -287,6 +289,7 @@ int main()
     al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
     al_install_audio();
     al_init_acodec_addon();
+
 
     ALLEGRO_FONT* font;
 
@@ -319,21 +322,14 @@ int main()
     bool abc = false;
     bool exit_game = false;
 
-    /* Your Code Below */
-    Cards cards_nivel1;
-
-
     al_reserve_samples(2);
     ALLEGRO_SAMPLE *background_sound;
     ALLEGRO_SAMPLE_ID background_sound_id;
     background_sound = al_load_sample("./backgroundsound.ogg");
-    //al_play_sample(background_sound, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, &background_sound_id);
-    //al_reserve_samples(1);
 
     ALLEGRO_SAMPLE *sound_click;
     ALLEGRO_SAMPLE_ID sound_click_id;
     sound_click = al_load_sample("./click.ogg");
-
 
 
     int CARD_DIMENSION_WIDTH = 100;
@@ -343,7 +339,7 @@ int main()
     ALLEGRO_BITMAP* background; background= al_load_bitmap("./images/background.jpg");
 
 
-    img_carro = al_load_bitmap("./images/carro.jpg");
+    some_img = al_load_bitmap("./images/carro.jpg");
     img_car = al_load_bitmap("./images/car.jpg");
     img_dog = al_load_bitmap("./images/dog.jpg");
     img_cachorro = al_load_bitmap("./images/cachorro.jpg");
@@ -363,6 +359,24 @@ int main()
     img_school= al_load_bitmap("./images/school.jpg");
     img_sol = al_load_bitmap("./images/sol.jpg");
     img_sun= al_load_bitmap("./images/sun.jpg");
+
+    Card* some_card;
+    Card* card_carro = new Card("carro", 1);
+    Card* card_car = new Card("car", 1);
+    Card* card_cachorro = new Card("cachorro", 2);
+    Card* card_dog = new Card("dog", 2);
+    Card* card_gato = new Card("gato", 3);
+    Card* card_cat = new Card("cat", 3);
+
+    Cards cards_nivel1;
+    cards_nivel1.cards.push_back(card_carro);
+    cards_nivel1.cards.push_back(card_car);
+    cards_nivel1.cards.push_back(card_cachorro);
+    cards_nivel1.cards.push_back(card_dog);
+    cards_nivel1.cards.push_back(card_gato);
+    cards_nivel1.cards.push_back(card_cat);
+
+    cards_nivel1.shuffle_cards();
 
     memset(key, 0, sizeof(key));
 
@@ -422,7 +436,7 @@ int main()
             al_clear_to_color(al_map_rgb(0, 0, 0));
 
             al_draw_bitmap_region(title, 0, 0, 400, 80, 200, 0, 0);
-            al_draw_textf(font, al_map_rgb(255, 255, 255), 10, 10, 0, "%s", "Score: 0");
+            //al_draw_textf(font, al_map_rgb(255, 255, 255), 10, 10, 0, "%s %d", "Score:", controller_a.score);
             al_draw_textf(font, al_map_rgb(255, 255, 255), 685, 585, 0, "%s", "version 1.0.0");
 
             int column_x = 0;
@@ -435,14 +449,20 @@ int main()
             int card_position_y_initial = card_position_y;
             card_position_x = card_position_x + margin_left;
             int period = 1;
-            for (int i = 0; i < 20; i++) {
-                string card_name = cards_nivel1.get_card_by_index(i);
+            for (int i = 0; i < 6; i++) {
+                /**string card_name = cards_nivel1.get_card_by_index(i);
+
                 if ((controller_a.card_number_one == i || controller_a.card_number_two == i) || is_card_got_it_right(&controller_a, i)) {
                     ALLEGRO_BITMAP* some_card = get_img_by_card_name(card_name);
                     al_draw_bitmap_region(some_card, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
                 } else {
                     al_draw_bitmap_region(background, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
-                }
+                } **/
+
+                some_card = cards_nivel1.cards[i];
+                al_draw_bitmap_region(some_card->getImg(), 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
+
+
                 card_position_x = card_position_x + card_position_deslocation;
                 if (period == 5) {
                     card_position_y = card_position_y + jump_line;
@@ -453,15 +473,15 @@ int main()
                 period = period + 1;
             } // for
 
-            al_draw_bitmap_region(selection, 0, 0, 100, 100, card_position_x_initial + (controller_a.column * card_position_deslocation) , card_position_y_initial + (controller_a.line * card_position_deslocation), 0);
+            // al_draw_bitmap_region(selection, 0, 0, 100, 100, card_position_x_initial + (controller_a.column * card_position_deslocation) , card_position_y_initial + (controller_a.line * card_position_deslocation), 0);
 
-            if (controller_a.turn == TURN::FINISH && controller_a.block_events == 0)
-                check_card_got_it_right(&controller_a, cards_nivel1.get_card_by_index(controller_a.card_number_one), cards_nivel1.get_card_by_index(controller_a.card_number_two));
+            //if (controller_a.turn == TURN::FINISH && controller_a.block_events == 0)
+            //    check_card_got_it_right(&controller_a, cards_nivel1.get_card_by_index(controller_a.card_number_one), cards_nivel1.get_card_by_index(controller_a.card_number_two));
         }
 
-        if (controller_a.turn == TURN::ENDGAME) {
-            al_draw_textf(font, al_map_rgb(255, 255, 255), 320, 535, 0, "%s", "Press ENTER to restart");
-        }
+        //if (controller_a.turn == TURN::ENDGAME) {
+        //    al_draw_textf(font, al_map_rgb(255, 255, 255), 320, 535, 0, "%s", "Press ENTER to restart");
+        //}
 
         al_draw_textf(font, al_map_rgb(255, 255, 255), 255, 520, 0, "%s", "Controls: SPACE and ARROWS, ESC to exit");
 
@@ -477,8 +497,7 @@ int main()
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
     al_destroy_sample(background_sound);
-
-
+    delete card_car, card_carro, card_cachorro, card_dog, card_gato, card_cat;
 
     return 0;
 }
