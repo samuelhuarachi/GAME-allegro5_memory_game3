@@ -170,11 +170,12 @@ void controller_a_selection_by_space_pressed(CONTROLLER_A* controller_a, Cards* 
 
         show_cards(cards_nivel1);
         al_flip_display();
-        al_rest(1.9);
 
         if (!is_card_got_it_right(controller_a)) {
             controller_a->card1->isFaceDown = true;
             controller_a->card2->isFaceDown = true;
+
+            al_rest(1.9);
         }
 
         controller_a->turn = TURN::OPEN_FIRST;
@@ -265,28 +266,36 @@ int main()
     selection= al_load_bitmap("./images/selection.png");
     background= al_load_bitmap("./images/background.jpg");
 
-    Card* card_carro = new Card("carro", 1);
-    Card* card_car = new Card("car", 1);
-    Card* card_cachorro = new Card("cachorro", 2);
-    Card* card_dog = new Card("dog", 2);
-    Card* card_gato = new Card("gato", 3);
-    Card* card_cat = new Card("cat", 3);
-    Card* card_casa = new Card("casa", 4);
-    Card* card_house = new Card("house", 4);
-    Card* card_arvore = new Card("arvore", 5);
-    Card* card_tree = new Card("tree", 5);
 
     Cards cards_nivel1;
-    cards_nivel1.cards.push_back(card_carro);
-    cards_nivel1.cards.push_back(card_car);
-    cards_nivel1.cards.push_back(card_cachorro);
-    cards_nivel1.cards.push_back(card_dog);
-    cards_nivel1.cards.push_back(card_gato);
-    cards_nivel1.cards.push_back(card_cat);
-    cards_nivel1.cards.push_back(card_casa);
-    cards_nivel1.cards.push_back(card_house);
-    cards_nivel1.cards.push_back(card_arvore);
-    cards_nivel1.cards.push_back(card_tree);
+    cards_nivel1.cards.push_back(new Card("corta_unhas", 1));
+    cards_nivel1.cards.push_back(new Card("nail_clippers", 1));
+    cards_nivel1.cards.push_back(new Card("cabeleireiro", 2));
+    cards_nivel1.cards.push_back(new Card("hairdresser", 2));
+    cards_nivel1.cards.push_back(new Card("lenco", 3));
+    cards_nivel1.cards.push_back(new Card("tissues", 3));
+    cards_nivel1.cards.push_back(new Card("mala", 4));
+    cards_nivel1.cards.push_back(new Card("suitecase", 4));
+    cards_nivel1.cards.push_back(new Card("torta", 5));
+    cards_nivel1.cards.push_back(new Card("pie", 5));
+    cards_nivel1.cards.push_back(new Card("macaneta", 6));
+    cards_nivel1.cards.push_back(new Card("door_handle", 6));
+    cards_nivel1.cards.push_back(new Card("almofada", 7));
+    cards_nivel1.cards.push_back(new Card("cushion", 7));
+    cards_nivel1.cards.push_back(new Card("fogao", 8));
+    cards_nivel1.cards.push_back(new Card("stove", 8));
+    cards_nivel1.cards.push_back(new Card("bode", 9));
+    cards_nivel1.cards.push_back(new Card("goat", 9));
+    cards_nivel1.cards.push_back(new Card("tartaruga", 10));
+    cards_nivel1.cards.push_back(new Card("tortoise", 10));
+    cards_nivel1.cards.push_back(new Card("cisnei", 11));
+    cards_nivel1.cards.push_back(new Card("swan", 11));
+    cards_nivel1.cards.push_back(new Card("caranguejo", 12));
+    cards_nivel1.cards.push_back(new Card("crab", 12));
+    cards_nivel1.cards.push_back(new Card("uva", 13));
+    cards_nivel1.cards.push_back(new Card("grape", 13));
+    cards_nivel1.cards.push_back(new Card("bus", 14));
+    cards_nivel1.cards.push_back(new Card("onibus", 14));
 
     cards_nivel1.shuffle_cards();
 
@@ -357,7 +366,7 @@ int main()
                 show_cards(&cards_nivel1);
 
                 al_flip_display();
-                al_rest(1.9);
+                al_rest(3.5);
 
                 hidden_all_cards(&cards_nivel1);
                 controller_a.turn = TURN::OPEN_FIRST;
