@@ -22,14 +22,15 @@ void Card::setName(const std::string& name)
     this->name = name;
 }
 
-void Card::setFaceDown(const bool& isFaceDown)
-{
-    this->isFaceDown = isFaceDown;
-}
 
 std::string Card::getName() const
 {
     return name;
+}
+
+int Card::getIdentifier() const
+{
+    return identifier;
 }
 
 int Card::getWidth() const

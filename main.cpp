@@ -133,6 +133,9 @@ typedef struct CONTROLLER_A
     int card_number_one = -1;
     int card_number_two = -1;
 
+    Card* card1;
+    Card* card2;
+
     unsigned int block_events = 0;
 
     std::vector<int> got_right;
@@ -182,8 +185,8 @@ void controller_a_set_line_column_by_key_direction_pressed(unsigned char *key, C
         controller_a->column = 0;
     }
 
-    if (controller_a->column > 4) {
-        controller_a->column = 4;
+    if (controller_a->column > 6) {
+        controller_a->column = 6;
     }
 }
 
@@ -191,44 +194,35 @@ bool is_all_cards_are_opened(CONTROLLER_A* controller_a) {
     return controller_a->got_right.size() == 20;
 }
 
-bool is_card_got_it_right(CONTROLLER_A* controller_a, int index_to_find) {
-    if (std::find(controller_a->got_right.begin(), controller_a->got_right.end(), index_to_find) != controller_a->got_right.end()) {
+bool is_card_got_it_right(CONTROLLER_A* controller_a) {
+    if (controller_a->card1->getIdentifier() == controller_a->card2->getIdentifier()) {
         return true;
     }
     return false;
 }
 
-void controller_a_selection_by_space_pressed(CONTROLLER_A* controller_a) {
+void controller_a_selection_by_space_pressed(CONTROLLER_A* controller_a, Cards* cards_nivel1) {
 
-    // check if is a got card
-    int card_selected = controller_a->line * 5 + controller_a->column;
-    if (is_card_got_it_right(controller_a, card_selected)) {
+    int card_selected = controller_a->line * 7 + controller_a->column;
+    Card* some_card = cards_nivel1->cards[card_selected];
+
+    if (controller_a->turn == TURN::OPEN_FIRST) {
+        some_card->isFaceDown = false;
+        controller_a->card1 = some_card;
+        controller_a->turn = TURN::OPEN_SECOND;
         return;
     }
 
-    if (controller_a->turn == TURN::OPEN_FIRST) {
-        controller_a->selection_one_column = controller_a->column;
-        controller_a->selection_one_line = controller_a->line;
+    if (controller_a->turn == TURN::OPEN_SECOND && some_card->isFaceDown == true) {
+        some_card->isFaceDown = false;
+        controller_a->card2 = some_card;
+        controller_a->turn = TURN::FINISH;
 
-        controller_a->card_number_one = card_selected;
-        controller_a->turn = TURN::OPEN_SECOND;
-    }
-
-    if (controller_a->turn == TURN::OPEN_SECOND) {
-        controller_a->selection_two_column = controller_a->column;
-        controller_a->selection_two_line = controller_a->line;
-
-        controller_a->card_number_two = card_selected;
-
-        // check if open the same card at the first turn
-        if (controller_a->card_number_two == controller_a->card_number_one) {
-            controller_a->selection_two_column = -1;
-            controller_a->selection_two_line = -1;
+        if (is_card_got_it_right(controller_a)) {
             return;
         }
 
-        controller_a->turn = TURN::FINISH;
-        controller_a->block_events = 100;
+        // controller_a->block_events = 100;
     }
 }
 
@@ -367,6 +361,10 @@ int main()
     Card* card_dog = new Card("dog", 2);
     Card* card_gato = new Card("gato", 3);
     Card* card_cat = new Card("cat", 3);
+    Card* card_casa = new Card("casa", 4);
+    Card* card_house = new Card("house", 4);
+    Card* card_arvore = new Card("arvore", 5);
+    Card* card_tree = new Card("tree", 5);
 
     Cards cards_nivel1;
     cards_nivel1.cards.push_back(card_carro);
@@ -375,12 +373,16 @@ int main()
     cards_nivel1.cards.push_back(card_dog);
     cards_nivel1.cards.push_back(card_gato);
     cards_nivel1.cards.push_back(card_cat);
+    cards_nivel1.cards.push_back(card_casa);
+    cards_nivel1.cards.push_back(card_house);
+    cards_nivel1.cards.push_back(card_arvore);
+    cards_nivel1.cards.push_back(card_tree);
 
     cards_nivel1.shuffle_cards();
 
     memset(key, 0, sizeof(key));
 
-    al_play_sample(background_sound, 0.3, 0, 1, ALLEGRO_PLAYMODE_LOOP, &background_sound_id);
+    // al_play_sample(background_sound, 0.3, 0, 1, ALLEGRO_PLAYMODE_LOOP, &background_sound_id);
 
     while(!exit_game) {
         al_wait_for_event(queue, &event);
@@ -401,7 +403,7 @@ int main()
                 key[event.keyboard.keycode] = KEY_SEEN | KEY_RELEASED;
 
                 if(key[ALLEGRO_KEY_SPACE] && controller_a.block_events == 0) {
-                    controller_a_selection_by_space_pressed(&controller_a);
+                    controller_a_selection_by_space_pressed(&controller_a, &cards_nivel1);
                     al_play_sample(sound_click, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, &sound_click_id);
                 }
 
@@ -443,28 +445,34 @@ int main()
             int card_position_x = 2;
             int card_position_y = 90;
             int card_position_deslocation = 103;
-            int margin_left = 142;
+            int margin_left = 37;
             int jump_line = 103;
             int card_position_x_initial = card_position_x + margin_left;
             int card_position_y_initial = card_position_y;
             card_position_x = card_position_x + margin_left;
             int period = 1;
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < cards_nivel1.cards.size(); i++) {
                 /**string card_name = cards_nivel1.get_card_by_index(i);
 
                 if ((controller_a.card_number_one == i || controller_a.card_number_two == i) || is_card_got_it_right(&controller_a, i)) {
                     ALLEGRO_BITMAP* some_card = get_img_by_card_name(card_name);
                     al_draw_bitmap_region(some_card, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
                 } else {
-                    al_draw_bitmap_region(background, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
+
                 } **/
 
                 some_card = cards_nivel1.cards[i];
-                al_draw_bitmap_region(some_card->getImg(), 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
+
+                if (some_card->isFaceDown) {
+                    al_draw_bitmap_region(background, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
+                } else {
+                    al_draw_bitmap_region(some_card->getImg(), 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
+                }
+
 
 
                 card_position_x = card_position_x + card_position_deslocation;
-                if (period == 5) {
+                if (period == 7) {
                     card_position_y = card_position_y + jump_line;
                     card_position_x = card_position_x_initial;
                     period = 0;
@@ -473,7 +481,7 @@ int main()
                 period = period + 1;
             } // for
 
-            // al_draw_bitmap_region(selection, 0, 0, 100, 100, card_position_x_initial + (controller_a.column * card_position_deslocation) , card_position_y_initial + (controller_a.line * card_position_deslocation), 0);
+            al_draw_bitmap_region(selection, 0, 0, 100, 100, card_position_x_initial + (controller_a.column * card_position_deslocation) , card_position_y_initial + (controller_a.line * card_position_deslocation), 0);
 
             //if (controller_a.turn == TURN::FINISH && controller_a.block_events == 0)
             //    check_card_got_it_right(&controller_a, cards_nivel1.get_card_by_index(controller_a.card_number_one), cards_nivel1.get_card_by_index(controller_a.card_number_two));

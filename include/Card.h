@@ -17,7 +17,8 @@ class Card
         ALLEGRO_BITMAP* getImg() const;
         int getWidth() const;
         int getHeight() const;
-        void setFaceDown(const bool& isFaceDown);
+        int getIdentifier() const;
+        bool isFaceDown = true;
 
     protected:
 
@@ -27,7 +28,7 @@ class Card
         const int identifier;
         int width = 100;
         int height = 100;
-        bool isFaceDown = true;
+
 };
 
 #endif // CARD_H
