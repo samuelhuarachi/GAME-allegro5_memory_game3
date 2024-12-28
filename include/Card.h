@@ -18,7 +18,7 @@ class Card
         int getWidth() const;
         int getHeight() const;
         int getIdentifier() const;
-        bool isFaceDown = true;
+        bool isFaceDown = false;
 
     protected:
 
