@@ -65,6 +65,7 @@ typedef struct CONTROLLER_A
 
 CONTROLLER_A controller_a;
 
+
 void controller_a_restart(CONTROLLER_A* controller_a, Cards* cards_nivel) {
     cards_nivel->shuffle_cards();
     controller_a->turn = TURN::PRESENTATION;
@@ -135,6 +136,7 @@ void show_cards(Cards* cards_nivel) {
         } else {
             al_draw_bitmap_region(some_card->getImg(), 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
         }
+
 
         card_position_x = card_position_x + card_position_deslocation;
         if (period == 7) {
