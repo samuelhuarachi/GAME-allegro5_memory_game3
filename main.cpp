@@ -27,10 +27,13 @@ using std::endl;
 using std::string;
 using std::ifstream;
 using std::vector;
+
 #define KEY_SEEN     1
 #define KEY_RELEASED 2
 #include "Cards.h"
 #include "Card.h"
+#include "menu.h"
+
 
 int CARD_DIMENSION_WIDTH = 100;
 int CARD_DIMENSION_HEIGHT = 100;
@@ -38,6 +41,8 @@ bool ALL_CARDS_ARE_OPENED = true;
 
 ALLEGRO_BITMAP* background;
 ALLEGRO_BITMAP* selection;
+ALLEGRO_FONT* font;
+ALLEGRO_BITMAP* menu_background;
 
 bool is_pressing_the_key(int key) {
     if (key) {
@@ -53,10 +58,18 @@ enum TURN {
     ENDGAME
 };
 
+enum CUTSCENE {
+    INTRO,
+    MENU,
+    INGAME
+};
+
 typedef struct CONTROLLER_A
 {
+    int total_players = 1;
     int line, column, score = 0;
     TURN turn = TURN::PRESENTATION;
+    CUTSCENE cutscene = CUTSCENE::MENU;
 
     Card* card1;
     Card* card2;
@@ -202,8 +215,31 @@ void hidden_all_cards(Cards* cards_nivel) {
     }
 }
 
+void in_game(Cards* cards_nivel1, CONTROLLER_A* controller_a) {
+    if (controller_a->turn == TURN::PRESENTATION) {
+        show_all_cards(cards_nivel1);
+        show_cards(cards_nivel1);
+
+        al_flip_display();
+        al_rest(3.5);
+
+        hidden_all_cards(cards_nivel1);
+        controller_a->turn = TURN::OPEN_FIRST;
+    }
+
+    show_cards(cards_nivel1);
+
+    if (ALL_CARDS_ARE_OPENED) {
+        al_draw_textf(font, al_map_rgb(255, 255, 255), 400, 585, 0, "%s", "endgame");
+        controller_a->turn = TURN::ENDGAME;
+    }
+}
+
+
+
 int main()
 {
+
     ALLEGRO_DISPLAY* display;
 
     if(!al_init())
@@ -224,7 +260,7 @@ int main()
     al_init_acodec_addon();
 
 
-    ALLEGRO_FONT* font;
+
 
     //al_set_new_display_flags(ALLEGRO_FULLSCREEN);
     display = al_create_display(800,600);
@@ -267,6 +303,7 @@ int main()
     ALLEGRO_BITMAP* title; title= al_load_bitmap("./images/title.png");
     selection= al_load_bitmap("./images/selection.png");
     background= al_load_bitmap("./images/background.jpg");
+    menu_background = al_load_bitmap("./images/menu_background.jpg");
 
 
     Cards cards_nivel1;
@@ -323,6 +360,8 @@ int main()
             case ALLEGRO_EVENT_KEY_DOWN:
                 key[event.keyboard.keycode] = KEY_SEEN | KEY_RELEASED;
 
+
+
                 if(key[ALLEGRO_KEY_SPACE]) {
                     al_play_sample(sound_click, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, &sound_click_id);
                     controller_a_selection_by_space_pressed(&controller_a, &cards_nivel1);
@@ -336,6 +375,7 @@ int main()
                 if(key[ALLEGRO_KEY_ENTER] && controller_a.turn == TURN::ENDGAME) {
                     controller_a_restart(&controller_a, &cards_nivel1);
                 }
+
 
                 break;
             case ALLEGRO_EVENT_KEY_UP:
@@ -363,26 +403,24 @@ int main()
             //al_draw_textf(font, al_map_rgb(255, 255, 255), 10, 10, 0, "%s %d", "Score:", controller_a.score);
             al_draw_textf(font, al_map_rgb(255, 255, 255), 685, 585, 0, "%s", "version 1.0.0");
 
-            if (controller_a.turn == TURN::PRESENTATION) {
-                show_all_cards(&cards_nivel1);
-                show_cards(&cards_nivel1);
 
-                al_flip_display();
-                al_rest(3.5);
 
-                hidden_all_cards(&cards_nivel1);
-                controller_a.turn = TURN::OPEN_FIRST;
+            switch(controller_a.cutscene)
+            {
+                case CUTSCENE::MENU:
+                    show_menu(menu_background, font);
+                    break;
+
+                case CUTSCENE::INGAME:
+                    in_game(&cards_nivel1, &controller_a);
+                    al_draw_textf(font, al_map_rgb(255, 255, 255), 255, 520, 0, "%s", "Controls: SPACE and ARROWS, ESC to exit");
+                    break;
             }
 
-            show_cards(&cards_nivel1);
 
-            if (ALL_CARDS_ARE_OPENED) {
-                al_draw_textf(font, al_map_rgb(255, 255, 255), 400, 585, 0, "%s", "endgame");
-                controller_a.turn = TURN::ENDGAME;
-            }
         }
 
-        al_draw_textf(font, al_map_rgb(255, 255, 255), 255, 520, 0, "%s", "Controls: SPACE and ARROWS, ESC to exit");
+
         al_flip_display();
 
 
@@ -392,6 +430,7 @@ int main()
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
     al_destroy_sample(background_sound);
+    al_destroy_bitmap(menu_background);
 
     return 0;
 }

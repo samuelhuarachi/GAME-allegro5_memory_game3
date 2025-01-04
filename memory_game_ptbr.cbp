@@ -44,9 +44,13 @@
 		</Compiler>
 		<Unit filename="include/Card.h" />
 		<Unit filename="include/Cards.h" />
+		<Unit filename="include/Player.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="menu.cpp" />
+		<Unit filename="menu.h" />
 		<Unit filename="src/Card.cpp" />
 		<Unit filename="src/Cards.cpp" />
+		<Unit filename="src/Player.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>
