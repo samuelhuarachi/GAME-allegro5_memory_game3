@@ -33,6 +33,7 @@ using std::vector;
 #include "Cards.h"
 #include "Card.h"
 #include "menu.h"
+#include "controller_a.h"
 
 
 int CARD_DIMENSION_WIDTH = 100;
@@ -50,31 +51,6 @@ bool is_pressing_the_key(int key) {
     }
     return false;
 }
-
-enum TURN {
-    PRESENTATION,
-    OPEN_FIRST,
-    OPEN_SECOND,
-    ENDGAME
-};
-
-enum CUTSCENE {
-    INTRO,
-    MENU,
-    INGAME
-};
-
-typedef struct CONTROLLER_A
-{
-    int total_players = 1;
-    int line, column, score = 0;
-    TURN turn = TURN::PRESENTATION;
-    CUTSCENE cutscene = CUTSCENE::MENU;
-
-    Card* card1;
-    Card* card2;
-
-} CONTROLLER_A;
 
 CONTROLLER_A controller_a;
 
@@ -361,28 +337,36 @@ int main()
                 key[event.keyboard.keycode] = KEY_SEEN | KEY_RELEASED;
 
 
+                if (controller_a.cutscene == CUTSCENE::INGAME) {
+                    if(key[ALLEGRO_KEY_SPACE]) {
+                        al_play_sample(sound_click, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, &sound_click_id);
+                        controller_a_selection_by_space_pressed(&controller_a, &cards_nivel1);
 
-                if(key[ALLEGRO_KEY_SPACE]) {
-                    al_play_sample(sound_click, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, &sound_click_id);
-                    controller_a_selection_by_space_pressed(&controller_a, &cards_nivel1);
+                    }
 
+                    if((key[ALLEGRO_KEY_UP] || key[ALLEGRO_KEY_DOWN] || key[ALLEGRO_KEY_LEFT] || key[ALLEGRO_KEY_RIGHT])) {
+                        controller_a_set_line_column_by_key_direction_pressed(key, &controller_a);
+                    }
+
+                    if(key[ALLEGRO_KEY_ENTER] && controller_a.turn == TURN::ENDGAME) {
+                        controller_a_restart(&controller_a, &cards_nivel1);
+                    }
+                } else if (controller_a.cutscene == CUTSCENE::MENU) {
+                    menu_keydown(key, &controller_a);
+
+                    if (controller_a.cutscene == CUTSCENE::EXIT) {
+                        exit_game = true;
+                    }
                 }
-
-                if((key[ALLEGRO_KEY_UP] || key[ALLEGRO_KEY_DOWN] || key[ALLEGRO_KEY_LEFT] || key[ALLEGRO_KEY_RIGHT])) {
-                    controller_a_set_line_column_by_key_direction_pressed(key, &controller_a);
-                }
-
-                if(key[ALLEGRO_KEY_ENTER] && controller_a.turn == TURN::ENDGAME) {
-                    controller_a_restart(&controller_a, &cards_nivel1);
-                }
-
 
                 break;
             case ALLEGRO_EVENT_KEY_UP:
                 if(key[ALLEGRO_KEY_A]) {
                 }
                 if(key[ALLEGRO_KEY_ESCAPE]) {
-                    exit_game = true;
+                    if (controller_a.cutscene == CUTSCENE::INGAME) {
+                        controller_a.cutscene = CUTSCENE::MENU;
+                    }
                 }
                 key[event.keyboard.keycode] &= KEY_RELEASED;
                 break;
