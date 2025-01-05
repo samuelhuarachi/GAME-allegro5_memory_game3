@@ -34,6 +34,7 @@ using std::vector;
 #include "Card.h"
 #include "menu.h"
 #include "controller_a.h"
+#include "menu_player.h"
 
 
 int CARD_DIMENSION_WIDTH = 100;
@@ -58,7 +59,10 @@ CONTROLLER_A controller_a;
 void controller_a_restart(CONTROLLER_A* controller_a, Cards* cards_nivel) {
     cards_nivel->shuffle_cards();
     controller_a->turn = TURN::PRESENTATION;
-    controller_a->score = 0;
+
+    int score = 0;
+    controller_a->player1->setScore(score);
+    controller_a->player2->setScore(score);
 }
 
 void controller_a_set_line_column_by_key_direction_pressed(unsigned char *key, CONTROLLER_A* controller_a) {
@@ -166,7 +170,32 @@ void controller_a_selection_by_space_pressed(CONTROLLER_A* controller_a, Cards* 
             controller_a->card1->isFaceDown = true;
             controller_a->card2->isFaceDown = true;
 
-            al_rest(1.9);
+            if (controller_a->player_turn == 1) {
+
+                if (controller_a->total_players == 2)
+                    controller_a->player_turn  = 2;
+
+                int score_calculate = controller_a->player1->getScore() - 15;
+                controller_a->player1->setScore(score_calculate);
+            }
+            else {
+                if (controller_a->total_players == 2)
+                    controller_a->player_turn  = 1;
+
+                int score_calculate = controller_a->player2->getScore() - 15;
+                controller_a->player2->setScore(score_calculate);
+            }
+
+            al_rest(1.5);
+        } else {
+            if (controller_a->player_turn == 1) {
+                int score_calculate = controller_a->player1->getScore() + 25;
+                controller_a->player1->setScore(score_calculate);
+            }
+            else {
+                int score_calculate = controller_a->player2->getScore() + 25;
+                controller_a->player2->setScore(score_calculate);
+            }
         }
 
         controller_a->turn = TURN::OPEN_FIRST;
@@ -209,8 +238,20 @@ void in_game(Cards* cards_nivel1, CONTROLLER_A* controller_a) {
         al_draw_textf(font, al_map_rgb(255, 255, 255), 400, 585, 0, "%s", "endgame");
         controller_a->turn = TURN::ENDGAME;
     }
-}
 
+    if (controller_a->player_turn == 1) {
+        al_draw_textf(font, al_map_rgb(255, 255, 255), 37, 40, 0, "%s", "Player 1 turn");
+    } else {
+        al_draw_textf(font, al_map_rgb(255, 255, 255), 37, 40, 0, "%s", "Player 2 turn");
+    }
+
+    al_draw_textf(font, al_map_rgb(255, 255, 255), 255, 520, 0, "%s", "Controls: SPACE and ARROWS, ESC to menu");
+    al_draw_textf(font, al_map_rgb(255, 255, 255), 37, 520, 0, "%s %d", "Player 1 score:", controller_a->player1->getScore());
+
+    if (controller_a->total_players == 2) {
+        al_draw_textf(font, al_map_rgb(255, 255, 255), 37, 535, 0, "%s %d", "Player 2 score:", controller_a->player2->getScore());
+    }
+}
 
 
 int main()
@@ -234,8 +275,6 @@ int main()
     al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
     al_install_audio();
     al_init_acodec_addon();
-
-
 
 
     //al_set_new_display_flags(ALLEGRO_FULLSCREEN);
@@ -281,6 +320,14 @@ int main()
     background= al_load_bitmap("./images/background.jpg");
     menu_background = al_load_bitmap("./images/menu_background.jpg");
 
+    Player player1;
+    player1.setName("Player 1");
+
+    Player player2;
+    player2.setName("Player 2");
+
+    controller_a.player1 = &player1;
+    controller_a.player2 = &player2;
 
     Cards cards_nivel1;
     cards_nivel1.cards.push_back(new Card("corta_unhas", 1));
@@ -341,7 +388,6 @@ int main()
                     if(key[ALLEGRO_KEY_SPACE]) {
                         al_play_sample(sound_click, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, &sound_click_id);
                         controller_a_selection_by_space_pressed(&controller_a, &cards_nivel1);
-
                     }
 
                     if((key[ALLEGRO_KEY_UP] || key[ALLEGRO_KEY_DOWN] || key[ALLEGRO_KEY_LEFT] || key[ALLEGRO_KEY_RIGHT])) {
@@ -356,6 +402,12 @@ int main()
 
                     if (controller_a.cutscene == CUTSCENE::EXIT) {
                         exit_game = true;
+                    }
+                } else if (controller_a.cutscene == CUTSCENE::TOTAL_PLAYERS) {
+                    menu_player_keydown(key, &controller_a);
+
+                    if(key[ALLEGRO_KEY_ENTER] && controller_a.turn == TURN::ENDGAME) {
+                        controller_a_restart(&controller_a, &cards_nivel1);
                     }
                 }
 
@@ -382,39 +434,31 @@ int main()
 
         if (al_is_event_queue_empty(queue)) {
             al_clear_to_color(al_map_rgb(0, 0, 0));
-
-            al_draw_bitmap_region(title, 0, 0, 400, 80, 200, 0, 0);
-            //al_draw_textf(font, al_map_rgb(255, 255, 255), 10, 10, 0, "%s %d", "Score:", controller_a.score);
-            al_draw_textf(font, al_map_rgb(255, 255, 255), 685, 585, 0, "%s", "version 1.0.0");
-
-
+            //al_draw_bitmap_region(title, 0, 0, 400, 80, 200, 0, 0);
+            //al_draw_textf(font, al_map_rgb(255, 255, 255), 685, 585, 0, "%s", "version 1.0.0");
 
             switch(controller_a.cutscene)
             {
                 case CUTSCENE::MENU:
                     show_menu(menu_background, font);
                     break;
-
+                case CUTSCENE::TOTAL_PLAYERS:
+                    show_menu_player(menu_background, font, &controller_a);
+                    break;
                 case CUTSCENE::INGAME:
                     in_game(&cards_nivel1, &controller_a);
-                    al_draw_textf(font, al_map_rgb(255, 255, 255), 255, 520, 0, "%s", "Controls: SPACE and ARROWS, ESC to exit");
                     break;
             }
-
-
         }
 
-
         al_flip_display();
-
-
-
     } // game loop
 
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
     al_destroy_sample(background_sound);
     al_destroy_bitmap(menu_background);
+
 
     return 0;
 }

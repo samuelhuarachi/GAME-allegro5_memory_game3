@@ -4,6 +4,7 @@
 enum CUTSCENE {
     INTRO,
     MENU,
+    TOTAL_PLAYERS,
     INGAME,
     EXIT
 };

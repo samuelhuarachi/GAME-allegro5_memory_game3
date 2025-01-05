@@ -1,6 +1,7 @@
 #include "Card.h"
 
 
+
 Card::Card(const std::string& name, const int& identifier) : name(name), identifier(identifier)
 {
     const char* basePath = "./images/";

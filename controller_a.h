@@ -4,16 +4,21 @@
 #include "Card.h"
 #include "turn.h"
 #include "cutscene.h"
+#include "Player.h"
 
 typedef struct CONTROLLER_A
 {
-    int total_players = 1;
-    int line, column, score = 0;
+    unsigned int total_players = 1;
+    unsigned int player_turn = 1;
+    unsigned int line, column = 0;
     TURN turn = TURN::PRESENTATION;
     CUTSCENE cutscene = CUTSCENE::MENU;
 
     Card* card1;
     Card* card2;
+
+    Player* player1;
+    Player* player2;
 
 } CONTROLLER_A;
 
