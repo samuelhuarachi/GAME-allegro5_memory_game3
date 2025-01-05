@@ -10,7 +10,7 @@ typedef struct CONTROLLER_A
 {
     unsigned int total_players = 1;
     unsigned int player_turn = 1;
-    unsigned int line, column = 0;
+    int line, column = 0;
     TURN turn = TURN::PRESENTATION;
     CUTSCENE cutscene = CUTSCENE::MENU;
 

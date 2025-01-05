@@ -42,6 +42,8 @@
 			<Add option="-fexceptions" />
 			<Add directory="../../../../../allegro-5.0.10-mingw-4.7.0/include" />
 		</Compiler>
+		<Unit filename="controller_a.h" />
+		<Unit filename="cutscene.h" />
 		<Unit filename="include/Card.h" />
 		<Unit filename="include/Cards.h" />
 		<Unit filename="include/Player.h" />
@@ -53,6 +55,7 @@
 		<Unit filename="src/Card.cpp" />
 		<Unit filename="src/Cards.cpp" />
 		<Unit filename="src/Player.cpp" />
+		<Unit filename="turn.h" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>

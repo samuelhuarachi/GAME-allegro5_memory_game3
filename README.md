@@ -1,6 +1,6 @@
 # Memory Game 2
 
-![alt text](https://i.ibb.co/TBqxfyJ/Captkure.png)
+![alt text](https://i.ibb.co/jyjM2Qj/memory-game-v2.png)
 
 
 Educational Benefits:

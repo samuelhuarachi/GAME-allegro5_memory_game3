@@ -45,6 +45,7 @@ ALLEGRO_BITMAP* background;
 ALLEGRO_BITMAP* selection;
 ALLEGRO_FONT* font;
 ALLEGRO_BITMAP* menu_background;
+ALLEGRO_BITMAP* game_background;
 
 bool is_pressing_the_key(int key) {
     if (key) {
@@ -142,7 +143,7 @@ void show_cards(Cards* cards_nivel) {
     } // for
 
      // Selection
-     al_draw_bitmap_region(selection, 0, 0, 100, 100, card_position_x_initial + (controller_a.column * card_position_deslocation) , card_position_y_initial + (controller_a.line * card_position_deslocation), 0);
+     al_draw_bitmap_region(selection, 0, 0, 100, 100, card_position_x_initial + (controller_a.column * card_position_deslocation) + 60 , card_position_y_initial + (controller_a.line * card_position_deslocation) + 40, 0);
 
 }
 
@@ -221,6 +222,9 @@ void hidden_all_cards(Cards* cards_nivel) {
 }
 
 void in_game(Cards* cards_nivel1, CONTROLLER_A* controller_a) {
+    //al_draw_bitmap_region(background, 0, 0, CARD_DIMENSION_WIDTH, CARD_DIMENSION_HEIGHT, card_position_x, card_position_y, 0);
+    al_draw_bitmap(game_background, 0, 0, 0);
+
     if (controller_a->turn == TURN::PRESENTATION) {
         show_all_cards(cards_nivel1);
         show_cards(cards_nivel1);
@@ -316,9 +320,10 @@ int main()
     sound_click = al_load_sample("./click.ogg");
 
     ALLEGRO_BITMAP* title; title= al_load_bitmap("./images/title.png");
-    selection= al_load_bitmap("./images/selection.png");
+    selection= al_load_bitmap("./images/pointer.png");
     background= al_load_bitmap("./images/background.jpg");
     menu_background = al_load_bitmap("./images/menu_background.jpg");
+    game_background = al_load_bitmap("./images/game_background.jpg");
 
     Player player1;
     player1.setName("Player 1");
