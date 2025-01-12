@@ -20,6 +20,9 @@ typedef struct CONTROLLER_A
     Player* player1;
     Player* player2;
 
+    bool menu_sound_was_started = false;
+    bool ingame_sound_was_started = false;
+
 } CONTROLLER_A;
 
 #endif // CONTROLLER_A_H_INCLUDED

@@ -3,6 +3,8 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 #include <iostream>
 #include <vector>
 #include "controller_a.h"
@@ -26,13 +28,15 @@ void show_menu_player(ALLEGRO_BITMAP* menu_background, ALLEGRO_FONT* font, CONTR
     }
 }
 
-void menu_player_keydown(unsigned char *key, CONTROLLER_A *controller_a) {
+void menu_player_keydown(unsigned char *key, CONTROLLER_A *controller_a, ALLEGRO_SAMPLE *sound_selection, ALLEGRO_SAMPLE_ID *sound_selection_id) {
     if(key[ALLEGRO_KEY_UP]) {
+         al_play_sample(sound_selection, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, sound_selection_id);
          controller_a->total_players = 1;
          return;
     }
 
     if(key[ALLEGRO_KEY_DOWN]) {
+        al_play_sample(sound_selection, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, sound_selection_id);
         controller_a->total_players = 2;
         return;
     }

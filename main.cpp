@@ -239,7 +239,7 @@ void in_game(Cards* cards_nivel1, CONTROLLER_A* controller_a) {
     show_cards(cards_nivel1);
 
     if (ALL_CARDS_ARE_OPENED) {
-        al_draw_textf(font, al_map_rgb(255, 255, 255), 400, 585, 0, "%s", "endgame");
+        al_draw_textf(font, al_map_rgb(255, 255, 255), 400, 560, 0, "%s", "press ENTER to restart");
         controller_a->turn = TURN::ENDGAME;
     }
 
@@ -310,14 +310,26 @@ int main()
     bool abc = false;
     bool exit_game = false;
 
-    al_reserve_samples(2);
-    ALLEGRO_SAMPLE *background_sound;
-    ALLEGRO_SAMPLE_ID background_sound_id;
-    background_sound = al_load_sample("./backgroundsound.ogg");
+    al_reserve_samples(5);
+    ALLEGRO_SAMPLE *menu_sound;
+    ALLEGRO_SAMPLE_ID menu_sound_id;
+    menu_sound = al_load_sample("./sounds/menu_sound.ogg");
+
+    ALLEGRO_SAMPLE *ingame_sound;
+    ALLEGRO_SAMPLE_ID ingame_sound_id;
+    ingame_sound = al_load_sample("./sounds/ingame.ogg");
 
     ALLEGRO_SAMPLE *sound_click;
     ALLEGRO_SAMPLE_ID sound_click_id;
-    sound_click = al_load_sample("./click.ogg");
+    sound_click = al_load_sample("./sounds/click.ogg");
+
+    ALLEGRO_SAMPLE *sound_selection;
+    ALLEGRO_SAMPLE_ID sound_selection_id;
+    sound_selection = al_load_sample("./sounds/selection.ogg");
+
+    ALLEGRO_SAMPLE *sound_start;
+    ALLEGRO_SAMPLE_ID sound_start_id;
+    sound_start = al_load_sample("./sounds/start.ogg");
 
     ALLEGRO_BITMAP* title; title= al_load_bitmap("./images/title.png");
     selection= al_load_bitmap("./images/pointer.png");
@@ -369,6 +381,7 @@ int main()
     memset(key, 0, sizeof(key));
 
     // al_play_sample(background_sound, 0.3, 0, 1, ALLEGRO_PLAYMODE_LOOP, &background_sound_id);
+    //al_stop_sample(id);
 
     while(!exit_game) {
         al_wait_for_event(queue, &event);
@@ -388,7 +401,6 @@ int main()
             case ALLEGRO_EVENT_KEY_DOWN:
                 key[event.keyboard.keycode] = KEY_SEEN | KEY_RELEASED;
 
-
                 if (controller_a.cutscene == CUTSCENE::INGAME) {
                     if(key[ALLEGRO_KEY_SPACE]) {
                         al_play_sample(sound_click, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, &sound_click_id);
@@ -403,13 +415,13 @@ int main()
                         controller_a_restart(&controller_a, &cards_nivel1);
                     }
                 } else if (controller_a.cutscene == CUTSCENE::MENU) {
-                    menu_keydown(key, &controller_a);
+                    menu_keydown(key, &controller_a, sound_selection, &sound_selection_id, sound_start, &sound_start_id);
 
                     if (controller_a.cutscene == CUTSCENE::EXIT) {
                         exit_game = true;
                     }
                 } else if (controller_a.cutscene == CUTSCENE::TOTAL_PLAYERS) {
-                    menu_player_keydown(key, &controller_a);
+                    menu_player_keydown(key, &controller_a, sound_selection, &sound_selection_id);
 
                     if(key[ALLEGRO_KEY_ENTER] && controller_a.turn == TURN::ENDGAME) {
                         controller_a_restart(&controller_a, &cards_nivel1);
@@ -439,18 +451,36 @@ int main()
 
         if (al_is_event_queue_empty(queue)) {
             al_clear_to_color(al_map_rgb(0, 0, 0));
-            //al_draw_bitmap_region(title, 0, 0, 400, 80, 200, 0, 0);
-            //al_draw_textf(font, al_map_rgb(255, 255, 255), 685, 585, 0, "%s", "version 1.0.0");
 
             switch(controller_a.cutscene)
             {
                 case CUTSCENE::MENU:
+
+                    if (controller_a.ingame_sound_was_started) {
+                        al_stop_sample(&ingame_sound_id);
+                        controller_a.ingame_sound_was_started = false;
+                    }
+                    if (!controller_a.menu_sound_was_started) {
+                        al_play_sample(menu_sound, 0.6, 0, 1, ALLEGRO_PLAYMODE_LOOP, &menu_sound_id);
+                        controller_a.menu_sound_was_started = true;
+                    }
+
                     show_menu(menu_background, font);
                     break;
                 case CUTSCENE::TOTAL_PLAYERS:
                     show_menu_player(menu_background, font, &controller_a);
                     break;
                 case CUTSCENE::INGAME:
+                    if (controller_a.menu_sound_was_started) {
+                        al_stop_sample(&menu_sound_id);
+                        controller_a.menu_sound_was_started = false;
+                    }
+
+                    if (!controller_a.ingame_sound_was_started) {
+                        al_play_sample(ingame_sound, 0.6, 0, 1, ALLEGRO_PLAYMODE_LOOP, &ingame_sound_id);
+                        controller_a.ingame_sound_was_started = true;
+                    }
+
                     in_game(&cards_nivel1, &controller_a);
                     break;
             }
@@ -461,7 +491,7 @@ int main()
 
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
-    al_destroy_sample(background_sound);
+    al_destroy_sample(menu_sound);
     al_destroy_bitmap(menu_background);
 
 
@@ -469,6 +499,10 @@ int main()
 }
 
 /**
+
+sound effects free: https://www.chosic.com/free-music/piano/, https://pixabay.com/sound-effects/search/background%20piano/?pagi=2
+acesso arquivos, virutal diretorios (exemplo: doom.wad): https://icculus.org/physfs/docs/html/
+
 
 Cão - Dog
 Gato - Cat
