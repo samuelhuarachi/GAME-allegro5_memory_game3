@@ -492,8 +492,11 @@ int main()
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
     al_destroy_sample(menu_sound);
+    al_destroy_sample(sound_click);
+    al_destroy_sample(sound_selection);
+    al_destroy_sample(sound_start);
+    al_destroy_sample(ingame_sound);
     al_destroy_bitmap(menu_background);
-
 
     return 0;
 }
