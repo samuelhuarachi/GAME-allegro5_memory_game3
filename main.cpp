@@ -239,7 +239,7 @@ void in_game(Cards* cards_nivel1, CONTROLLER_A* controller_a) {
     show_cards(cards_nivel1);
 
     if (ALL_CARDS_ARE_OPENED) {
-        al_draw_textf(font, al_map_rgb(255, 255, 255), 400, 560, 0, "%s", "press ENTER to restart");
+        al_draw_textf(font, al_map_rgb(255, 255, 255), 320, 550, 0, "%s", "press ENTER to restart");
         controller_a->turn = TURN::ENDGAME;
     }
 
@@ -281,11 +281,10 @@ int main()
     al_init_acodec_addon();
 
 
-    //al_set_new_display_flags(ALLEGRO_FULLSCREEN);
+    al_set_new_display_flags(ALLEGRO_FULLSCREEN);
     display = al_create_display(800,600);
     if(!display)
         al_show_native_message_box(NULL,NULL,NULL,"Couldnt create Screen",NULL,NULL);
-
 
     ALLEGRO_EVENT_QUEUE* queue;
 
@@ -318,6 +317,8 @@ int main()
     ALLEGRO_SAMPLE *ingame_sound;
     ALLEGRO_SAMPLE_ID ingame_sound_id;
     ingame_sound = al_load_sample("./sounds/ingame.ogg");
+
+
 
     ALLEGRO_SAMPLE *sound_click;
     ALLEGRO_SAMPLE_ID sound_click_id;
@@ -503,9 +504,76 @@ int main()
 
 /**
 
+speech to text free
+https://ttsmp3.com/
+
+1 - retrovisor - side mirror
+martelo - hammer
+caneleira - shin guard
+calçada - sidewalk
+escova de dente - toothbrush
+pata - paw
+esgoto - sewage
+boeiro -drain
+Abacaxi - Pineapple
+petroleo - oil
+celeiro - barn
+Amanhecer - Dawn - 11
+Ranzinza - Grumpy
+manga - mango
+grama - grass
+
+
+tijolo - brick
+colher - spoon
+garfo - fork
+caderno - notebook paper
+geladeira - fridge
+cana de açucar - sugarcane
+chuteira - soccer cleats
+manga - t-shirt sleeve
+pano de mesa - tablecloth
+caixa de areia de gato -litter box
+dever de casa - homework
+Cavalo-marinho - Seahorse
+Piquenique - Picnic
+Eclético - Eclectic
+Deslumbrante - Stunning
+Ferroviário - Railway worker
+Cavaleiro - Knight
+Sussurro - Whisper
+Esplêndido - Splendid
+Labirinto - Labyrinth
+Alma - Soul
+Mendigo - Beggar
+Penumbra - Twilight
+Peregrino - Pilgrim
+Vagalume - Firefly
+Inóspito - Inhospitable
+Nefasto - Nefarious
+Pálido - Pale
+Voraz - Voracious
+
+
+PARTS OF THE CAR
+Volante - Steering wheel
+Freio - Brake
+Motor - Engine
+Capô - Hood
+Porta-malas - Trunk
+Rodas - Wheels
+Faróis - Headlights
+Pára-choques - Bumper
+Para-brisa - Windshield
+Retrovisor - Rearview mirror
+Banco - Seat
+Câmbio - Gear shift
+Pneu - Tire
+Suspensão - Suspension
+
+
 sound effects free: https://www.chosic.com/free-music/piano/, https://pixabay.com/sound-effects/search/background%20piano/?pagi=2
 acesso arquivos, virutal diretorios (exemplo: doom.wad): https://icculus.org/physfs/docs/html/
-
 
 Cão - Dog
 Gato - Cat
