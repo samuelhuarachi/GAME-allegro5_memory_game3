@@ -281,7 +281,7 @@ int main()
     al_init_acodec_addon();
 
 
-    al_set_new_display_flags(ALLEGRO_FULLSCREEN);
+    // al_set_new_display_flags(ALLEGRO_FULLSCREEN);
     display = al_create_display(800,600);
     if(!display)
         al_show_native_message_box(NULL,NULL,NULL,"Couldnt create Screen",NULL,NULL);
@@ -348,34 +348,34 @@ int main()
     controller_a.player2 = &player2;
 
     Cards cards_nivel1;
-    cards_nivel1.cards.push_back(new Card("corta_unhas", 1));
-    cards_nivel1.cards.push_back(new Card("nail_clippers", 1));
-    cards_nivel1.cards.push_back(new Card("cabeleireiro", 2));
-    cards_nivel1.cards.push_back(new Card("hairdresser", 2));
-    cards_nivel1.cards.push_back(new Card("lenco", 3));
-    cards_nivel1.cards.push_back(new Card("tissues", 3));
-    cards_nivel1.cards.push_back(new Card("mala", 4));
-    cards_nivel1.cards.push_back(new Card("suitecase", 4));
-    cards_nivel1.cards.push_back(new Card("torta", 5));
-    cards_nivel1.cards.push_back(new Card("pie", 5));
-    cards_nivel1.cards.push_back(new Card("macaneta", 6));
-    cards_nivel1.cards.push_back(new Card("door_handle", 6));
-    cards_nivel1.cards.push_back(new Card("almofada", 7));
-    cards_nivel1.cards.push_back(new Card("cushion", 7));
-    cards_nivel1.cards.push_back(new Card("fogao", 8));
-    cards_nivel1.cards.push_back(new Card("stove", 8));
-    cards_nivel1.cards.push_back(new Card("bode", 9));
-    cards_nivel1.cards.push_back(new Card("goat", 9));
-    cards_nivel1.cards.push_back(new Card("tartaruga", 10));
-    cards_nivel1.cards.push_back(new Card("tortoise", 10));
-    cards_nivel1.cards.push_back(new Card("cisnei", 11));
-    cards_nivel1.cards.push_back(new Card("swan", 11));
-    cards_nivel1.cards.push_back(new Card("caranguejo", 12));
-    cards_nivel1.cards.push_back(new Card("crab", 12));
-    cards_nivel1.cards.push_back(new Card("uva", 13));
-    cards_nivel1.cards.push_back(new Card("grape", 13));
-    cards_nivel1.cards.push_back(new Card("bus", 14));
-    cards_nivel1.cards.push_back(new Card("onibus", 14));
+    cards_nivel1.cards.push_back(new Card("abacaxi", 1));
+    cards_nivel1.cards.push_back(new Card("pineapple", 1));
+    cards_nivel1.cards.push_back(new Card("amanhecer", 2));
+    cards_nivel1.cards.push_back(new Card("dawn", 2));
+    cards_nivel1.cards.push_back(new Card("barn", 3));
+    cards_nivel1.cards.push_back(new Card("celeiro", 3));
+    cards_nivel1.cards.push_back(new Card("boeiro", 4));
+    cards_nivel1.cards.push_back(new Card("drain", 4));
+    cards_nivel1.cards.push_back(new Card("calcada", 5));
+    cards_nivel1.cards.push_back(new Card("sidewalk", 5));
+    cards_nivel1.cards.push_back(new Card("caneleira", 6));
+    cards_nivel1.cards.push_back(new Card("shin_guard", 6));
+    cards_nivel1.cards.push_back(new Card("escova_de_dente", 7));
+    cards_nivel1.cards.push_back(new Card("toothbrush", 7));
+    cards_nivel1.cards.push_back(new Card("esgoto", 8));
+    cards_nivel1.cards.push_back(new Card("sewage", 8));
+    cards_nivel1.cards.push_back(new Card("grama", 9));
+    cards_nivel1.cards.push_back(new Card("grass", 9));
+    cards_nivel1.cards.push_back(new Card("grumpy", 10));
+    cards_nivel1.cards.push_back(new Card("ranzinza", 10));
+    cards_nivel1.cards.push_back(new Card("hammer", 11));
+    cards_nivel1.cards.push_back(new Card("martelo", 11));
+    cards_nivel1.cards.push_back(new Card("manga", 12));
+    cards_nivel1.cards.push_back(new Card("mango", 12));
+    cards_nivel1.cards.push_back(new Card("oil", 13));
+    cards_nivel1.cards.push_back(new Card("petroleo", 13));
+    cards_nivel1.cards.push_back(new Card("pata", 14));
+    cards_nivel1.cards.push_back(new Card("paw", 14));
 
     cards_nivel1.shuffle_cards();
 
