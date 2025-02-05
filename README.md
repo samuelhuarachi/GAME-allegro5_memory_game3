@@ -1,6 +1,6 @@
-# Memory Game 2
+# Memory Game 3
 
-![alt text](https://i.ibb.co/jyjM2Qj/memory-game-v2.png)
+![alt text](https://cppgames.s3.sa-east-1.amazonaws.com/memory_game3.PNG)
 
 
 Educational Benefits:
